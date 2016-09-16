@@ -78,5 +78,6 @@
     <None Include="..\..\Dependencies\max\Code\TranslationUnits\Hardware\CPU\IsCPUIDAvailablePolicies\Documentation.md">
       <Filter>Dependencies\max\Hardware\CPU\IsCPUIDAvailablePolicies</Filter>
     </None>
+    <None Include="..\..\LICENSE" />
   </ItemGroup>
 </Project>
