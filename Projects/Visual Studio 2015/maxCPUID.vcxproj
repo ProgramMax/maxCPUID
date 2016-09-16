@@ -184,6 +184,7 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="..\..\Dependencies\max\Code\TranslationUnits\Hardware\CPU\IsCPUIDAvailablePolicies\Documentation.md" />
+    <None Include="..\..\LICENSE" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
