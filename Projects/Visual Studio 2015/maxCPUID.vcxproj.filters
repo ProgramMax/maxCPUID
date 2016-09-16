@@ -1,0 +1,82 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <ClCompile Include="..\..\Code\EntryPoint.cpp" />
+    <ClCompile Include="..\..\Dependencies\max\Code\TranslationUnits\Hardware\CPU\Associativity.cpp">
+      <Filter>Dependencies\max\Hardware\CPU</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Dependencies\max\Code\TranslationUnits\Hardware\CPU\CacheInfo.cpp">
+      <Filter>Dependencies\max\Hardware\CPU</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Dependencies\max\Code\TranslationUnits\Hardware\CPU\CacheLevel.cpp">
+      <Filter>Dependencies\max\Hardware\CPU</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Dependencies\max\Code\TranslationUnits\Hardware\CPU\CPUID.cpp">
+      <Filter>Dependencies\max\Hardware\CPU</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Dependencies\max\Code\TranslationUnits\Hardware\CPU\CPUIDSubleafArgumentsAndResult.cpp">
+      <Filter>Dependencies\max\Hardware\CPU</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Dependencies\max\Code\TranslationUnits\Hardware\CPU\Prefetch.cpp">
+      <Filter>Dependencies\max\Hardware\CPU</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Dependencies\max\Code\TranslationUnits\Hardware\CPU\TLB.cpp">
+      <Filter>Dependencies\max\Hardware\CPU</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Dependencies\max\Code\TranslationUnits\Hardware\CPU\TraceCache.cpp">
+      <Filter>Dependencies\max\Hardware\CPU</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Dependencies\max\Code\TranslationUnits\Hardware\CPU\CPUIDPolicies\AssemblyCPUIDPolicy.cpp">
+      <Filter>Dependencies\max\Hardware\CPU\CPUIDPolicies</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Dependencies\max\Code\TranslationUnits\Hardware\CPU\CPUIDPolicies\GCCAssemblyCPUIDPolicy.cpp">
+      <Filter>Dependencies\max\Hardware\CPU\CPUIDPolicies</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Dependencies\max\Code\TranslationUnits\Hardware\CPU\CPUIDPolicies\VCIntrinsicCPUIDPolicy.cpp">
+      <Filter>Dependencies\max\Hardware\CPU\CPUIDPolicies</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Dependencies\max\Code\TranslationUnits\Hardware\CPU\GCC\MakeCPUID.cpp">
+      <Filter>Dependencies\max\Hardware\CPU\GCC</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Dependencies\max\Code\TranslationUnits\Hardware\CPU\IsCPUIDAvailablePolicies\AssemblyIsCPUIDAvailablePolicy.cpp">
+      <Filter>Dependencies\max\Hardware\CPU\IsCPUIDAvailablePolicies</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Dependencies\max\Code\TranslationUnits\Hardware\CPU\IsCPUIDAvailablePolicies\GCCAssemblyIsCPUIDAvailablePolicy.cpp">
+      <Filter>Dependencies\max\Hardware\CPU\IsCPUIDAvailablePolicies</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Dependencies\max\Code\TranslationUnits\Hardware\CPU\VC\MakeCPUID.cpp">
+      <Filter>Dependencies\max\Hardware\CPU\VC</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <Filter Include="Dependencies">
+      <UniqueIdentifier>{fb52cb82-f21b-4e23-950d-09b8dbbe9109}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Dependencies\max">
+      <UniqueIdentifier>{860b94cc-ca05-4d21-bca0-cefa519bd148}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Dependencies\max\Hardware">
+      <UniqueIdentifier>{5565684e-5b02-491a-b855-25aba64f0475}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Dependencies\max\Hardware\CPU">
+      <UniqueIdentifier>{41ae247b-5b52-42cf-93b0-7f1992815052}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Dependencies\max\Hardware\CPU\CPUIDPolicies">
+      <UniqueIdentifier>{57ba441d-2a4f-441d-b0a6-f8fb0a24e5a6}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Dependencies\max\Hardware\CPU\GCC">
+      <UniqueIdentifier>{f0475550-11f9-4214-92f0-834fd79aa297}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Dependencies\max\Hardware\CPU\IsCPUIDAvailablePolicies">
+      <UniqueIdentifier>{76344c17-208e-42bb-bbd6-3dbb323ce995}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Dependencies\max\Hardware\CPU\VC">
+      <UniqueIdentifier>{268fe12c-830a-426e-b24f-0055b9f8f0fb}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="..\..\Dependencies\max\Code\TranslationUnits\Hardware\CPU\IsCPUIDAvailablePolicies\Documentation.md">
+      <Filter>Dependencies\max\Hardware\CPU\IsCPUIDAvailablePolicies</Filter>
+    </None>
+  </ItemGroup>
+</Project>
