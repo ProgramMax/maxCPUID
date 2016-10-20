@@ -17,7 +17,7 @@ namespace CPU
 	class AssemblyCPUIDPolicy
 	{
 	public:
-		
+
 		static void CPUID(         CPUIDSubleafResult & Registers, uint32_t Leaf )                   noexcept;
 		static void CPUIDExtended( CPUIDSubleafResult & Registers, uint32_t Leaf, uint32_t Subleaf ) noexcept;
 

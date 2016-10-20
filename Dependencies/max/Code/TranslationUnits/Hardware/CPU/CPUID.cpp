@@ -4,8 +4,6 @@
 
 #include <max/Hardware/CPU/CPUID.hpp>
 #include <cstdint>
-#include <max/Hardware/CPU/CPUIDPolicies/VCIntrinsicCPUIDPolicy.hpp>
-#include <max/Hardware/CPU/IsCPUIDAvailablePolicies/AssemblyIsCPUIDAvailablePolicy.hpp>
 #include <utility>
 #include <array>
 #include <memory>
@@ -16,6 +14,30 @@
 #include <max/Hardware/CPU/Prefetch.hpp>
 #include <max/Hardware/CPU/CacheInfo.hpp>
 #include <max/Hardware/CPU/Associativity.hpp>
+#include <max/Compiling/Configuration.hpp>
+
+#if defined( MAX_COMPILER_VC )
+	#include <max/Hardware/CPU/CPUIDPolicies/VCIntrinsicCPUIDPolicy.hpp>
+	#if defined( MAX_X86_64 )
+		#include <max/Hardware/CPU/IsCPUIDAvailablePolicies/X64AssemblyIsCPUIDAvailablePolicy.hpp>
+	#elif defined( MAX_X86 )
+		#include <max/Hardware/CPU/IsCPUIDAvailablePolicies/X86AssemblyIsCPUIDAvailablePolicy.hpp>
+	#else
+		static_assert( false, "Unsupported platform" );
+	#endif
+#elif defined( MAX_COMPILER_GCC ) || defined( MAX_COMPILER_CLANG )
+	#if defined( MAX_X86_64 )
+		#include <max/Hardware/CPU/IsCPUIDAvailablePolicies/X64GCCAssemblyIsCPUIDAvailablePolicy.hpp>
+		#include <max/Hardware/CPU/CPUIDPolicies/X64GCCAssemblyCPUIDPolicy.hpp>
+	#elif defined (MAX_X86 )
+		#include <max/Hardware/CPU/IsCPUIDAvailablePolicies/X86GCCAssemblyIsCPUIDAvailablePolicy.hpp>
+		#include <max/Hardware/CPU/CPUIDPolicies/X86GCCAssemblyCPUIDPolicy.hpp>
+	#else
+		static_assert( false, "Unsupported platform" );
+	#endif
+#else
+		static_assert( false, "Unsupported compiler" );
+#endif
 
 namespace max
 {
@@ -457,7 +479,7 @@ namespace CPU
 		std::vector< std::unique_ptr< max::CPU::CacheInfo > > Returning = {};
 
 		auto Family = this->Family();
-		auto Model = this->Model();
+		auto Model  = this->Model();
 
 
 
@@ -505,9 +527,9 @@ namespace CPU
 			// EAX 0b1'1111'1111'1110'0000'0000'0000 - Maximum number of addressable IDs for logical processors sharing this cache**, ***.
 			// EAX 0b1111'1110'0000'0000'0000'0000'0000'0000 - Maximum number of addressable IDs for processor cores in the physical
 
-			uint32_t CacheLineSizeInBytes = ( LeafFourSubleaf.Result.EBX & 0b1111'1111'1111 ) + 1;
-			uint32_t CacheLinesPerSector = ( ( LeafFourSubleaf.Result.EBX >> 12 ) & 0b11'1111'1111 ) + 1;
-			uint32_t WaysOfAssociativity = ( ( LeafFourSubleaf.Result.EBX >> 22 ) & 0b11'1111'1111 ) + 1;
+			uint32_t CacheLineSizeInBytes = (   LeafFourSubleaf.Result.EBX         & 0b1111'1111'1111 ) + 1;
+			uint32_t CacheLinesPerSector  = ( ( LeafFourSubleaf.Result.EBX >> 12 ) & 0b11'1111'1111   ) + 1;
+			uint32_t WaysOfAssociativity  = ( ( LeafFourSubleaf.Result.EBX >> 22 ) & 0b11'1111'1111   ) + 1;
 			uint32_t SetCount = LeafFourSubleaf.Result.ECX + 1;
 
 			uint32_t CacheSizeInBytes = CacheLineSizeInBytes * CacheLinesPerSector * WaysOfAssociativity * SetCount;
@@ -611,7 +633,7 @@ namespace CPU
 
 
 			// Check if the requested bit is set
-			return ( RegisterValue & ( 1 << BitNumber ) ) != 0;
+			return ( RegisterValue & ( 1u << BitNumber ) ) != 0;
 		}
 
 
@@ -627,22 +649,22 @@ namespace CPU
 			std::vector< std::unique_ptr< max::CPU::CacheInfo > > Returning = {};
 
 			// If the high bit is set this register contains valid information
-			if( ( RegisterValue & (1 << 31) ) == 0 )
+			if( ( RegisterValue & (1u << 31) ) == 0 )
 			{
 				// This register contains valid information
 				// Break this register into bytes
 				std::array< uint8_t, 4 > Bytes = {};
 				Split32BitsInto8Bits( RegisterValue, Bytes );
 
-				int i = 3;
+				size_t BytesToProcess = 4;
 				// Unlike the other registers, we ignore the last byte of EAX
 				if( IsRegisterEAX )
 				{
-					i = 2;
+					BytesToProcess = 3;
 				}
-				for( ; i >= 0; i-- )
+				for( ; BytesToProcess > 0; BytesToProcess-- )
 				{
-					auto CacheInfoForByte = GetCacheInfoForByte( Bytes[ i ], Family, Model );
+					auto CacheInfoForByte = GetCacheInfoForByte( Bytes[ BytesToProcess - 1 ], Family, Model );
 					std::move( std::begin( CacheInfoForByte ), std::end( CacheInfoForByte ), std::back_inserter( Returning ) );
 				}
 			}
@@ -652,10 +674,10 @@ namespace CPU
 
 		void Split32BitsInto8Bits( const uint32_t Input, std::array< uint8_t, 4 > & Bytes ) noexcept
 		{
-			Bytes[ 0 ] = static_cast< uint8_t >( ( Input & ( 0b1111'1111 << 24 ) ) >> 24 );
-			Bytes[ 1 ] = static_cast< uint8_t >( ( Input & ( 0b1111'1111 << 16 ) ) >> 16 );
-			Bytes[ 2 ] = static_cast< uint8_t >( ( Input & ( 0b1111'1111 << 8  ) ) >>  8 );
-			Bytes[ 3 ] = static_cast< uint8_t >( ( Input & ( 0b1111'1111 << 0  ) ) >>  0 );
+			Bytes[ 0 ] = static_cast< uint8_t >( ( Input & ( 0b1111'1111u << 24 ) ) >> 24 );
+			Bytes[ 1 ] = static_cast< uint8_t >( ( Input & ( 0b1111'1111u << 16 ) ) >> 16 );
+			Bytes[ 2 ] = static_cast< uint8_t >( ( Input & ( 0b1111'1111u << 8  ) ) >>  8 );
+			Bytes[ 3 ] = static_cast< uint8_t >( ( Input & ( 0b1111'1111u << 0  ) ) >>  0 );
 		}
 
 		std::vector< std::unique_ptr< max::CPU::CacheInfo > > GetCacheInfoForByte( const uint8_t Byte, const uint32_t Family, const uint32_t Model ) noexcept
@@ -1185,7 +1207,98 @@ namespace CPU
 			return Returning;
 		}
 
+		template< typename CPUIDPolicy >
+		std::vector< max::CPU::CPUIDSubleafArgumentsAndResult > GetCPUIDSubleafResults() noexcept
+		{
+			std::vector< max::CPU::CPUIDSubleafArgumentsAndResult > SubleafResults;
+
+
+
+			// cpuid function 0 returns the highest valid function number in EAX
+			max::CPU::CPUIDSubleafResult Result = {};
+			CPUIDPolicy::CPUID( Result, 0 );
+			const auto LeafCount = Result.EAX;
+
+
+			// Populate CPUID results
+			// We already ran function 0.
+			SubleafResults.emplace_back( 0, 0, std::move( Result ) );
+			// So we will loop through 1-x
+			for( uint32_t Leaf = 1; Leaf <= LeafCount; Leaf++ )
+			{
+				if( Leaf == 4 ) //-V112 Dangerous magic number 4 used -- in this case, it isn't a sizeof(int)
+				{
+					for( uint32_t Subleaf = 0; ; Subleaf++ )
+					{
+						CPUIDPolicy::CPUIDExtended( Result, Leaf, Subleaf );
+						if( Result.EAX == 0 && Result.EBX == 0 && Result.ECX == 0 && Result.EDX == 0 )
+						{
+							break;
+						}
+
+						SubleafResults.emplace_back( Leaf, Subleaf, std::move( Result ) );
+					}
+				} else {
+					CPUIDPolicy::CPUID( Result, Leaf );
+					SubleafResults.emplace_back( Leaf, 0, std::move( Result ) );
+				}
+			}
+
+
+
+			// cpuid function 0x8000'0000 returns the highest valid extended function number in EAX
+			CPUIDPolicy::CPUID( Result, 0x8000'0000 ); // -V112 Dangerous magic number 0x8000'0000 -- in this case
+			const auto ExtendedLeafCount = Result.EAX - 0x8000'0000; // -V112
+
+
+			// Populate CPUID results
+			// We already ran extended function 0.
+			SubleafResults.emplace_back( 0x8000'0000, 0, std::move( Result ) ); // -V112
+			// So we will loop through 1-x
+			for( uint32_t i = 1; i <= ExtendedLeafCount; i++ )
+			{
+				CPUIDPolicy::CPUID( Result, i + 0x8000'0000 ); // -V112
+				SubleafResults.emplace_back( i + 0x8000'0000, 0, std::move( Result ) ); // -V112
+			}
+
+
+			return SubleafResults;
+		}
+
 	} // anonymous namespace
+
+	CPUID MakeCPUID() noexcept
+	{
+#if defined( MAX_COMPILER_VC )
+	#if defined( MAX_X86_64 )
+		typedef X64AssemblyIsCPUIDAvailablePolicy   IsCPUIDAvailablePolicy;
+	#elif defined( MAX_X86 )
+		typedef X86AssemblyIsCPUIDAvailablePolicy   IsCPUIDAvailablePolicy;
+	#else
+		static_assert( false, "Unsupported platform" );
+	#endif
+	typedef VCIntrinsicCPUIDPolicy                  CPUIDPolicy;
+#elif defined( MAX_COMPILER_GCC ) || defined( MAX_COMPILER_CLANG )
+	#if defined( MAX_X86_64 )
+		typedef X64GCCAssemblyIsCPUIDAvailablePolicy   IsCPUIDAvailablePolicy;
+		typedef X64GCCAssemblyCPUIDPolicy              CPUIDPolicy;
+	#elif defined( MAX_X86 )
+		typedef X86GCCAssemblyIsCPUIDAvailablePolicy   IsCPUIDAvailablePolicy;
+		typedef X86GCCAssemblyCPUIDPolicy              CPUIDPolicy;
+	#else
+		static_assert( false, "Unsupported platform" );
+	#endif
+#else
+		static_assert( false, "Unsupported compiler" );
+#endif
+
+		if( ! IsCPUIDAvailablePolicy::IsCPUIDAvailable() )
+		{
+			return CPUID{ std::vector< CPUIDSubleafArgumentsAndResult >{} };
+		}
+
+		return CPUID{ GetCPUIDSubleafResults< CPUIDPolicy >() };
+	}
 
 } // namespace CPU
 } // namespace max
