@@ -22,7 +22,7 @@ LIBRARY_PATHS = \
 	.
 LIBRARY_PATHS_FLAGS = $(foreach d, $(LIBRARY_PATHS), -L$d)
 
-CPPFLAGS += $(INCLUDE_PATHS_FLAGS) -std=c++14 -O3 -Wall -Wextra -Wpedantic -Wconversion -Wsign-conversion -m64
+CPPFLAGS += $(INCLUDE_PATHS_FLAGS) -std=c++14 -O3 -Werror -Wall -Wextra -Wpedantic -Wconversion -Wsign-conversion -m64
 LINKER_FLAGS += $(LIBRARY_PATHS_FLAGS)
 
 
